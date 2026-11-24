@@ -146,6 +146,97 @@
     padding: 15px;
     box-sizing: border-box;
 }
+
+/* WYBRALI NAS */
+
+.wybrali-nas {
+    padding: 75px 0;
+    background: #2e415a;
+    overflow: hidden;
+}
+
+.wybrali-nas .sekcja-naglowek {
+    padding: 0 8%;
+    margin-bottom: 45px;
+    text-align: center;
+}
+
+.wybrali-nas .sekcja-naglowek h2 {
+    color: #ffffff;
+    font-size: 34px;
+}
+
+.karuzela-klientow {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+
+    mask-image: linear-gradient(
+        to right,
+        transparent,
+        black 8%,
+        black 92%,
+        transparent
+    );
+}
+
+.karuzela-tor {
+    display: flex;
+    align-items: center;
+    gap: 65px;
+    width: max-content;
+
+    animation: przewijanie-klientow 35s linear infinite;
+}
+
+.karuzela-tor img {
+    width: 170px;
+    height: 100px;
+    object-fit: contain;
+    flex-shrink: 0;
+    filter: grayscale(100%);
+    opacity: 0.7;
+    transition: 0.3s;
+}
+
+.karuzela-tor img:hover {
+    filter: grayscale(0%);
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.karuzela-klientow:hover .karuzela-tor {
+    animation-play-state: paused;
+}
+
+@keyframes przewijanie-klientow {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+@media (max-width: 768px) {
+    .karuzela-tor {
+        gap: 35px;
+        animation-duration: 25s;
+    }
+
+    .karuzela-tor img {
+        width: 125px;
+        height: 60px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .karuzela-tor {
+        animation: none;
+    }
+}
+
 </style>
 <body>
     
@@ -195,6 +286,35 @@
     </div>
 
 </header>
+
+<section class="wyszukiwarka">
+    <div class="wyszukiwarka-kontener">
+
+        <h2>Jakiego rozwiązania szukasz?</h2>
+
+        <p>
+            Wpisz nazwę produktu lub interesującą Cię funkcjonalność.
+        </p>
+
+        <div class="szukaj-box">
+            <span class="szukaj-ikona">🔍</span>
+
+            <input
+                type="text"
+                id="szukajInput"
+                placeholder="Np. magazyn, sprzedaż, inWMS..."
+                aria-label="Wyszukaj produkty i rozwiązania"
+            >
+
+            <button type="button" id="wyczyscSzukaj">
+                WYCZYŚĆ
+            </button>
+        </div>
+
+        <p id="wynikWyszukiwania" aria-live="polite"></p>
+
+    </div>
+</section>
 
 <main>
 
@@ -450,6 +570,47 @@
         </div>
 
     </section>
+
+<section class="wybrali-nas">
+
+    <div class="sekcja-naglowek">
+        <h2>Wybrali nas</h2>
+        <p style="color: white;">
+            Firmy, które zaufały naszym rozwiązaniom
+            i współpracują z inSolutions.
+        </p>
+    </div>
+
+    <div class="karuzela-klientow">
+
+        <div class="karuzela-tor">
+
+            <!-- LOGOTYPY FIRM -->
+            <img src="kolba.svg" alt="kolba">
+            <img src="klos.svg" alt="klos">
+            <img src="jbl.png" alt="jbl">
+            <img src="charlie-food-friends.png" alt="charlie-food-friends">
+            <img src="monnari.png" alt="Klient 5">
+            <img src="szmidt.svg" alt="szmidt">
+            <img src="3w.png" alt="3w">
+            <img src="8a_logo.png" alt="8a">
+            
+
+            <!-- POWTÓRZENIE DLA PŁYNNEJ ANIMACJI -->
+             <img src="kolba.svg" alt="kolba">
+            <img src="klos.svg" alt="klos">
+            <img src="jbl.png" alt="jbl">
+            <img src="charlie-food-friends.png" alt="charlie-food-friends">
+            <img src="monnari.png" alt="Klient 5">
+            <img src="szmidt.svg" alt="szmidt">
+            <img src="3w.png" alt="3w">
+            <img src="8a_logo.png" alt="8a">
+
+        </div>
+
+    </div>
+
+</section>
 
     <section class="sekcja-obraz">
 
@@ -1041,6 +1202,88 @@ function changeLanguage(language) {
     });
 
 });
+</script>
+<script>
+    
+document.addEventListener("DOMContentLoaded", function () {
+
+    const input = document.getElementById("szukajInput");
+    const wynik = document.getElementById("wynikWyszukiwania");
+    const wyczysc = document.getElementById("wyczyscSzukaj");
+
+    // Elementy, które będą przeszukiwane
+    const elementy = document.querySelectorAll(
+        ".informacja, .produkt, .korzysc, .sekcja-obraz"
+    );
+
+    input.addEventListener("input", function () {
+
+        const fraza = input.value
+            .toLowerCase()
+            .trim()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
+
+        let znalezione = 0;
+
+        elementy.forEach(element => {
+
+            const tekst = element.innerText
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "");
+
+            if (tekst.includes(fraza)) {
+
+                element.style.display = "";
+                znalezione++;
+
+            } else {
+
+                element.style.display = "none";
+
+            }
+
+        });
+
+        if (fraza === "") {
+
+            elementy.forEach(element => {
+                element.style.display = "";
+            });
+
+            wynik.textContent = "";
+
+        } else if (znalezione > 0) {
+
+            wynik.textContent =
+                "Znaleziono: " + znalezione + " wyników.";
+
+        } else {
+
+            wynik.textContent =
+                "Nie znaleziono wyników dla: " + input.value;
+
+        }
+
+    });
+
+    wyczysc.addEventListener("click", function () {
+
+        input.value = "";
+
+        elementy.forEach(element => {
+            element.style.display = "";
+        });
+
+        wynik.textContent = "";
+
+        input.focus();
+
+    });
+
+});
+
 </script>
 </body>
 </html>
